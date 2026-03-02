@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "stocks": {
+      "command": "python",
+      "args": ["-m", "app.mcp.server"],
+      "env": {
+        "APP_ENV": "dev",
+        "ADMIN_DB_PATH": "data/admin/admin.db",
+        "TIMESERIES_DB_PATH": "data/timeseries/market.duckdb"
+      }
+    }
+  }
+}

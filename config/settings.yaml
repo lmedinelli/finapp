@@ -1,0 +1,13 @@
+app:
+  name: Financial Recommender
+  env: dev
+  default_currency: USD
+
+storage:
+  admin_db_path: data/admin/admin.db
+  timeseries_db_path: data/timeseries/market.duckdb
+
+market_data:
+  provider: yfinance
+  default_period: 1y
+  default_interval: 1d
