@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     api_port: int = 8000
     frontend_port: int = 8501
     admin_db_path: str = "data/admin/admin.db"
+    bootstrap_admin_username: str = "admin"
+    bootstrap_admin_email: str = "admin@local.dev"
+    bootstrap_admin_password: str | None = None
     timeseries_db_path: str = "data/timeseries/market.duckdb"
     default_currency: str = "USD"
     log_level: str = "INFO"

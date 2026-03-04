@@ -67,9 +67,10 @@ Prompt shortcuts management:
 cat config/prompt_shortcuts.json
 ```
 
-Admin default credentials (local development only):
-- username: `admin`
-- password: `passw0rd`
+Admin bootstrap credentials (local development):
+- username: value of `BOOTSTRAP_ADMIN_USERNAME` (default `admin`)
+- password: value of `BOOTSTRAP_ADMIN_PASSWORD` from your `.env`
+- if `BOOTSTRAP_ADMIN_PASSWORD` is unset, a one-time password is generated on bootstrap (logged in backend logs for `APP_ENV=dev`)
 
 System author metadata:
 - Author: `Luis Medinelli`
@@ -94,9 +95,10 @@ curl -X POST http://localhost:8000/v1/scan/the-market \
 curl http://localhost:8000/v1/integrations/status
 
 # Admin login (capture token)
+ADMIN_PASSWORD="${BOOTSTRAP_ADMIN_PASSWORD:-change-me}"
 TOKEN=$(curl -s -X POST http://localhost:8000/v1/admin/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"passw0rd"}' | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
+  -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}" | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
 
 curl http://localhost:8000/v1/admin/db/summary -H "Authorization: Bearer $TOKEN"
 curl http://localhost:8000/v1/admin/runtime/config -H "Authorization: Bearer $TOKEN"

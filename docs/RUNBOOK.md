@@ -42,8 +42,9 @@ python scripts/ingest_prices.py BTC-USD --asset-type crypto
 ## Admin workflow
 1. In sidebar `Workspace`, choose `Admin`.
 2. Login with local admin credentials:
-   - username `admin`
-   - password `passw0rd`
+   - username from `BOOTSTRAP_ADMIN_USERNAME` (default `admin`)
+   - password from `BOOTSTRAP_ADMIN_PASSWORD`
+   - if password is unset, check backend logs for generated one-time credential in `APP_ENV=dev`
 3. In `Settings` tab:
    - configure risk profile
    - toggle SerpAPI and AlphaVantage context
@@ -102,7 +103,7 @@ python scripts/ingest_prices.py BTC-USD --asset-type crypto
 
 ## Admin API auth validation
 1. Login:
-   - `curl -X POST http://localhost:8000/v1/admin/auth/login -H "Content-Type: application/json" -d '{"username":"admin","password":"passw0rd"}'`
+   - `curl -X POST http://localhost:8000/v1/admin/auth/login -H "Content-Type: application/json" -d "{\"username\":\"${BOOTSTRAP_ADMIN_USERNAME:-admin}\",\"password\":\"${BOOTSTRAP_ADMIN_PASSWORD:-change-me}\"}"`
 2. Use returned token:
    - `curl http://localhost:8000/v1/admin/db/summary -H "Authorization: Bearer <token>"`
 3. Logout:

@@ -187,7 +187,7 @@ Creates admin session token.
 ```json
 {
   "username": "admin",
-  "password": "passw0rd"
+  "password": "<BOOTSTRAP_ADMIN_PASSWORD>"
 }
 ```
 Response also includes `role`, `email`, `subscription_ends_at`, and `subscription_active`.

@@ -10,7 +10,7 @@
 - `admin_users`
   - `id`, `username`, `email`, `role`, `subscription_ends_at`, `password_hash`, `is_active`, `created_at`, `updated_at`, `last_login_at`
   - roles: `admin` or `user`
-  - default bootstrap user for local dev: `admin` / `passw0rd`
+  - bootstrap admin user is controlled by `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`
 - `admin_sessions`
   - `id`, `user_id`, `token`, `created_at`, `expires_at`
   - bearer-token session table for Admin API and Streamlit Admin workspace

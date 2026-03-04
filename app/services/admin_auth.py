@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import os
+import secrets
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.models.admin import AdminUser
 from app.repositories.admin_auth_repo import AdminAuthRepository
 
@@ -17,24 +20,39 @@ def _utc_now_naive() -> datetime:
 
 
 class AdminAuthService:
+    def __init__(self) -> None:
+        self.settings = get_settings()
+        self.logger = logging.getLogger(__name__)
+
     def ensure_default_admin_user(self, session: Session) -> None:
         repo = AdminAuthRepository(session)
-        existing = repo.get_user_by_username("admin")
+        username = str(self.settings.bootstrap_admin_username).strip() or "admin"
+        email = str(self.settings.bootstrap_admin_email).strip().lower() or "admin@local.dev"
+        existing = repo.get_user_by_username(username)
         if existing is not None:
             changed = False
             if existing.role != "admin":
                 existing.role = "admin"
                 changed = True
             if existing.email is None:
-                existing.email = "admin@local.dev"
+                existing.email = email
                 changed = True
             if changed:
                 session.commit()
             return
-        password_hash = self._hash_password("passw0rd")
+
+        configured_password = str(self.settings.bootstrap_admin_password or "").strip()
+        generated_password = False
+        if configured_password:
+            bootstrap_password = configured_password
+        else:
+            bootstrap_password = secrets.token_urlsafe(18)
+            generated_password = True
+
+        password_hash = self._hash_password(bootstrap_password)
         repo.create_user_extended(
-            username="admin",
-            email="admin@local.dev",
+            username=username,
+            email=email,
             password_hash=password_hash,
             role="admin",
             subscription_ends_at=None,
@@ -42,6 +60,24 @@ class AdminAuthService:
             mobile_phone=None,
             is_active=True,
         )
+        if generated_password:
+            if str(self.settings.app_env).strip().lower() == "dev":
+                self.logger.warning(
+                    (
+                        "BOOTSTRAP_ADMIN_PASSWORD not set; generated one-time admin credential for "
+                        "user '%s'. Temporary password: %s (rotate immediately)."
+                    ),
+                    username,
+                    bootstrap_password,
+                )
+            else:
+                self.logger.warning(
+                    (
+                        "BOOTSTRAP_ADMIN_PASSWORD not set; generated one-time admin credential for "
+                        "user '%s'. Rotate immediately."
+                    ),
+                    username,
+                )
 
     def login(
         self,
