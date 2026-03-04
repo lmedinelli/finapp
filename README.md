@@ -95,7 +95,8 @@ curl -X POST http://localhost:8000/v1/scan/the-market \
 curl http://localhost:8000/v1/integrations/status
 
 # Admin login (capture token)
-ADMIN_PASSWORD="${BOOTSTRAP_ADMIN_PASSWORD:-change-me}"
+# Set BOOTSTRAP_ADMIN_PASSWORD in .env, or read the generated one-time password from backend logs (APP_ENV=dev)
+ADMIN_PASSWORD="${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD must be set in .env}"
 TOKEN=$(curl -s -X POST http://localhost:8000/v1/admin/auth/login \
   -H "Content-Type: application/json" \
   -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}" | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
