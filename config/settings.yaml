@@ -1,6 +1,9 @@
 app:
   name: Financial Recommender
   env: dev
+  version: 0.2.0
+  author_name: Luis Medinelli
+  author_url: https://medinelli.ai
   default_currency: USD
 
 storage:
@@ -11,3 +14,55 @@ market_data:
   provider: yfinance
   default_period: 1y
   default_interval: 1d
+
+news:
+  provider: serpapi
+  endpoint: https://serpapi.com/search.json
+  max_items: 8
+
+agent:
+  llm_provider: openai
+  model: gpt-4.1
+  model_candidates: gpt-5,gpt-5-mini,gpt-5-nano,gpt-5.1,gpt-5.2,gpt-5.3-codex,gpt-4.1,gpt-4.1-mini,gpt-4o,gpt-4o-mini,o3,o4-mini
+  memory_messages: 10
+
+alphavantage:
+  mcp_url: https://mcp.alphavantage.co/mcp
+  daily_points: 120
+  news_items: 10
+
+chart_img:
+  base_url: https://api.chart-img.com
+  api_version: v2
+  advanced_chart_path: /v2/tradingview/advanced-chart
+  v1_advanced_chart_path: /v1/tradingview/advanced-chart
+  v2_advanced_chart_path: /v2/tradingview/advanced-chart
+  v3_advanced_chart_path:
+  max_width: 800
+  max_height: 600
+  max_studies: 3
+  rate_limit_per_sec: 1
+  daily_limit: 50
+  enforce_limits: true
+  tests_enabled: false
+  exchanges_path: /v3/tradingview/exchange/list
+  symbols_path: /v3/tradingview/exchange/{exchange}
+  search_path: /v3/tradingview/search/{query}
+
+coinmarketcap:
+  base_url: https://pro-api.coinmarketcap.com/v1
+
+scan_the_market:
+  low_cap_max_usd: 2000000000
+  stock_limit: 8
+  crypto_limit: 8
+  news_limit: 10
+  exchanges: NASDAQ,NYSE,AMEX
+
+alert_daemon:
+  enabled: true
+  autostart: false
+  frequency_seconds: 3600
+  heartbeat_grace_seconds: 180
+  max_symbols_per_cycle: 60
+  publish_chat_events: true

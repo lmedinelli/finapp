@@ -1,0 +1,32 @@
+{
+  "prompts": [
+    {
+      "text": "Should I buy AAPL for the next 2 weeks?",
+      "category": "short-term"
+    },
+    {
+      "text": "Long-term outlook for NVDA for 12 months.",
+      "category": "long-term"
+    },
+    {
+      "text": "Compare BTC and ETH for a balanced portfolio.",
+      "category": "portfolio"
+    },
+    {
+      "text": "Where are the key support and resistance levels for SPY?",
+      "category": "technical"
+    },
+    {
+      "text": "What are the major risk factors for TSLA right now?",
+      "category": "risk"
+    },
+    {
+      "text": "Show me a candle image for NVDA with SMA, EMA, RSI and MACD.",
+      "category": "chart-image"
+    },
+    {
+      "text": "ScanTheMarket: scan stocks and crypto with CoinMarketCap + IPO/ICO + news signals.",
+      "category": "scan"
+    }
+  ]
+}

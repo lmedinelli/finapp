@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "financial-recommender"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI-ready financial recommendation and analytics platform for stocks and crypto"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,6 +24,7 @@ dependencies = [
   "streamlit>=1.49.0",
   "plotly>=6.3.0",
   "mcp>=1.13.1",
+  "openai>=1.99.0",
   "python-dotenv>=1.1.1"
 ]
 
@@ -33,6 +34,7 @@ dev = [
   "pytest-cov>=6.2.0",
   "ruff>=0.12.0",
   "mypy>=1.17.0",
+  "pandas-stubs>=2.3.0.250703",
   "types-requests>=2.32.4.20250611",
   "pre-commit>=4.2.0"
 ]
@@ -47,6 +49,7 @@ include = ["app*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --cov=app --cov-report=term-missing"
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100
@@ -62,5 +65,6 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
+ignore_missing_imports = true
 plugins = []
 exclude = ["^data/"]
