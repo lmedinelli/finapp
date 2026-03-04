@@ -5,11 +5,82 @@
   - `id`, `name`, `risk_profile`, `base_currency`, `created_at`
 - `portfolio_positions`
   - `id`, `user_id`, `symbol`, `asset_type`, `quantity`, `avg_price`, `updated_at`
+- `chat_memory`
+  - `id`, `session_id`, `role`, `content`, `created_at`
+- `admin_users`
+  - `id`, `username`, `email`, `role`, `subscription_ends_at`, `password_hash`, `is_active`, `created_at`, `updated_at`, `last_login_at`
+  - roles: `admin` or `user`
+  - default bootstrap user for local dev: `admin` / `passw0rd`
+- `admin_sessions`
+  - `id`, `user_id`, `token`, `created_at`, `expires_at`
+  - bearer-token session table for Admin API and Streamlit Admin workspace
+- `alert_subscriptions`
+  - `id`, `user_id`, `symbol`, `asset_type`, `alert_scope`
+  - `rule_key` (optional template binding)
+  - `metric`, `operator`, `threshold`
+  - `frequency_seconds`, `timeframe`, `lookback_period`, `cooldown_minutes`
+  - `last_checked_at`, `last_triggered_at`
+  - `notes`, `is_active`, `created_at`, `updated_at`
+  - user-level alert subscriptions and cadence overrides
+- `alert_rules`
+  - `id`, `rule_key`, `name`, `description`, `category`
+  - `asset_type`, `timeframe`, `horizon`
+  - `action`, `severity`, `priority`
+  - `expression_json`, `data_requirements`, `is_active`
+  - `created_at`, `updated_at`
+  - rule catalog for daemon evaluation (BUY/SELL technical patterns)
+- `alert_daemon_state`
+  - singleton row `id=1`
+  - `is_enabled`, `is_running`, `frequency_seconds`, `active_instance_id`
+  - `last_started_at`, `last_heartbeat_at`
+  - `last_cycle_started_at`, `last_cycle_finished_at`, `last_cycle_status`
+  - `last_error`, `next_run_at`
+  - counters: `run_count`, `triggered_count`, `analyzed_count`
+  - daemon health/semaphore source of truth
+- `alert_daemon_cycles`
+  - `id`, `cycle_id`, `trigger_source`, `status`, `frequency_seconds`
+  - `symbols_count`, `subscriptions_evaluated`, `rules_evaluated`
+  - `alerts_triggered`, `analysis_rows_written`
+  - `steps_log`, `error`, `started_at`, `finished_at`, `next_run_at`, `instance_id`
+  - full per-cycle execution trace and diagnostics
+- `alert_trigger_logs`
+  - `id`, `cycle_id`, `subscription_id`
+  - `rule_key`, `rule_name`, `symbol`, `asset_type`, `timeframe`
+  - `action`, `severity`, `title`, `message`
+  - `metric_value`, `operator`, `threshold`, `payload`
+  - `deliver_to_user_id`, `delivered`, `created_at`
+  - persisted trigger events for adherence tracking and future notification delivery
+- `alert_agent_events`
+  - `id`, `cycle_id`, `source`, `event_type`, `message`, `payload`, `created_at`
+  - proactive assistant feed consumed by chat UI
+- `recommendation_logs`
+  - `id`, `created_at`, `source`, `session_id`, `request_message`, `symbol`, `asset_type`, `risk_profile`
+  - `short_action`, `short_confidence`, `long_action`, `long_confidence`
+  - `answer_text`, `workflow_steps`, `recommendation_payload`, `analysis_payload`, `market_context_payload`
+  - tracks model/system recommendation outputs
+- `market_scan_logs`
+  - `id`, `scan_id`, `created_at`, `trigger_source`, `low_cap_max_usd`
+  - `stock_count`, `crypto_count`, `ipo_count`, `ico_count`
+  - `payload`, `warnings`, `data_sources`
+  - tracks every ScanTheMarket execution
+- `runtime_config`
+  - `key`, `value`, `updated_at`
+  - persistent runtime overrides managed from Admin Diagnostics (OpenAI model, Chart-IMG API version/limits)
+- `chart_img_usage_log`
+  - `id`, `created_at`, `endpoint`, `status_code`, `api_version`, `note`
+  - local tracker for Chart-IMG quota/rate control and diagnostics
 
 ## DuckDB (`market.duckdb`)
 - `prices`
   - `symbol`, `asset_type`, `timestamp`, `open`, `high`, `low`, `close`, `volume`
+- `alert_analysis_snapshots`
+  - `cycle_id`, `analyzed_at`, `symbol`, `asset_type`, `timeframe`
+  - `metric`, `metric_value`, `source`, `meta_json`
+  - stores every analyzed metric row produced by alert daemon cycles
 
 ## Storage strategy
 - SQLite stores low-volume relational metadata.
 - DuckDB stores columnar analytical timeseries.
+- Alert daemon analyzed metrics are written to DuckDB for fast historical analytics.
+- Alert operational state, trigger logs, and agent-feed events are stored in SQLite.
+- Chat short memory and admin auth state remain local to SQLite for deterministic behavior and easy local debugging.

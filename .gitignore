@@ -11,6 +11,8 @@ htmlcov/
 .env
 .env.*
 *.db
+*.sqlite
+*.sqlite3
 *.duckdb
 *.parquet
 *.log
