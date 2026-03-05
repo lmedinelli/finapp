@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - MCP server for stock ingestion and analysis.
 - Tests, CI workflow, docs, and developer tooling.
 
+## [0.2.1] - 2026-03-04
+### Security
+- Remove hard-coded bootstrap admin password (`passw0rd`); bootstrap credentials are now fully env-driven via `BOOTSTRAP_ADMIN_PASSWORD`, or a cryptographically random one-time password is generated on first boot (plaintext shown in logs only when `APP_ENV=dev`).
+
 ## [0.2.0] - 2026-03-03
 ### Added
 - Chat-first end-user workflow (`POST /v1/chat`) and Streamlit chat interface.
