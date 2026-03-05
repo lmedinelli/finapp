@@ -1,3 +1,4 @@
+import os
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
@@ -6,6 +7,9 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
+ADMIN_BOOTSTRAP_USERNAME = os.getenv("BOOTSTRAP_ADMIN_USERNAME", "admin")
+ADMIN_BOOTSTRAP_PASSWORD = os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "admin-test-password")
+TEST_USER_PASSWORD = "test-user-password-1"
 
 
 def _login(username: str, password: str) -> dict[str, str]:
@@ -19,7 +23,7 @@ def _login(username: str, password: str) -> dict[str, str]:
 
 
 def test_admin_alert_subscription_crud_flow() -> None:
-    headers = _login("admin", "passw0rd")
+    headers = _login(ADMIN_BOOTSTRAP_USERNAME, ADMIN_BOOTSTRAP_PASSWORD)
     create_response = client.post(
         "/v1/admin/alerts/subscriptions",
         headers=headers,
@@ -64,7 +68,7 @@ def test_admin_alert_subscription_crud_flow() -> None:
 
 
 def test_user_requires_active_subscription_for_alerts() -> None:
-    admin_headers = _login("admin", "passw0rd")
+    admin_headers = _login(ADMIN_BOOTSTRAP_USERNAME, ADMIN_BOOTSTRAP_PASSWORD)
     username = f"user_{uuid4().hex[:10]}"
     email = f"{username}@example.com"
     create_user = client.post(
@@ -73,7 +77,7 @@ def test_user_requires_active_subscription_for_alerts() -> None:
         json={
             "username": username,
             "email": email,
-            "password": "passw0rd1",
+            "password": TEST_USER_PASSWORD,
             "role": "user",
             "is_active": True,
         },
@@ -81,7 +85,7 @@ def test_user_requires_active_subscription_for_alerts() -> None:
     assert create_user.status_code == 200
     user_id = int(create_user.json()["id"])
 
-    user_headers = _login(username, "passw0rd1")
+    user_headers = _login(username, TEST_USER_PASSWORD)
     denied = client.get("/v1/admin/alerts/subscriptions", headers=user_headers)
     assert denied.status_code == 403
 
@@ -93,6 +97,6 @@ def test_user_requires_active_subscription_for_alerts() -> None:
     )
     assert update_user.status_code == 200
 
-    user_headers = _login(username, "passw0rd1")
+    user_headers = _login(username, TEST_USER_PASSWORD)
     allowed = client.get("/v1/admin/alerts/subscriptions", headers=user_headers)
     assert allowed.status_code == 200

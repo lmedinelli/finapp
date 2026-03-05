@@ -1,14 +1,18 @@
+import os
+
 from fastapi.testclient import TestClient
 
 from app.main import app
 
 client = TestClient(app)
+ADMIN_BOOTSTRAP_USERNAME = os.getenv("BOOTSTRAP_ADMIN_USERNAME", "admin")
+ADMIN_BOOTSTRAP_PASSWORD = os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "admin-test-password")
 
 
 def _admin_headers() -> dict[str, str]:
     response = client.post(
         "/v1/admin/auth/login",
-        json={"username": "admin", "password": "passw0rd"},
+        json={"username": ADMIN_BOOTSTRAP_USERNAME, "password": ADMIN_BOOTSTRAP_PASSWORD},
     )
     assert response.status_code == 200
     token = response.json()["token"]
